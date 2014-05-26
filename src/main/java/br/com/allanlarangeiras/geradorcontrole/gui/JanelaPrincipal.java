@@ -87,11 +87,14 @@ public class JanelaPrincipal extends JFrame {
 	private void persisteUrls() {
 		List<String> urls = new ArrayList<String>();
 		int itens = txtUrl.getItemCount();
-		for (int i = 0; i < itens; i++) {
-			urls.add(txtUrl.getItemAt(i).toString());
-		}
 		if (txtUrl.getSelectedIndex() == -1) {
 			urls.add(txtUrl.getSelectedItem().toString());
+		}
+		for (int i = 0; i < itens; i++) {
+			if (urls.size() < 10) {
+				urls.add(txtUrl.getItemAt(i).toString());
+				
+			} 
 		}
 		
 		urlService.persistirUrls(urls);
