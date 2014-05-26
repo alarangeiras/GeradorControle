@@ -10,7 +10,7 @@ public class URLUtil {
 	private static String IGUAL = "=";
 	private static String INTERROGACAO = "?";
 	private static String AND = "&";
-	private static String HTTP = "http://";
+	private static String HTTP = "http";
 
 	private URLUtil() { }
 	
@@ -27,7 +27,7 @@ public class URLUtil {
 	public static String obterURL(String urlBase, Map<String, String> parametros) {
 		StringBuilder urlCompleta = new StringBuilder();
 		if (urlBase.length() > 0 && !urlBase.startsWith(HTTP)) {
-			urlCompleta.append(HTTP);
+			urlCompleta.append(HTTP + "://");
 		}
 		urlCompleta.append(urlBase);
 		urlCompleta.append(INTERROGACAO );

@@ -5,9 +5,12 @@ import static br.com.allanlarangeiras.geradorcontrole.util.ValidadorUtil.isIntei
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -15,7 +18,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import br.com.allanlarangeiras.geradorcontrole.service.GeradorControleService;
+import br.com.allanlarangeiras.geradorcontrole.service.UrlService;
 import br.com.allanlarangeiras.geradorcontrole.service.impl.GeradorControleServiceImpl;
+import br.com.allanlarangeiras.geradorcontrole.service.impl.UrlServiceImpl;
 import br.com.allanlarangeiras.geradorcontrole.tipos.URL100Corretor;
 import br.com.allanlarangeiras.geradorcontrole.util.Config;
 import br.com.allanlarangeiras.geradorcontrole.util.MessagesUtil;
@@ -33,7 +38,7 @@ public class JanelaPrincipal extends JFrame {
 	private JTextField txtId_Cia = new JTextField();
 	
 	private JLabel lblUrl = new JLabel();
-	private JTextField txtUrl = new JTextField();
+	private JComboBox<String> txtUrl = new JComboBox<String>();
 
 	private JButton btnGerarUrl = new JButton();
 	private JButton btnBradescor = new JButton();
@@ -42,6 +47,7 @@ public class JanelaPrincipal extends JFrame {
 	private StringBuilder mensagens = new StringBuilder();
 	
 	private GeradorControleService geradorControle = GeradorControleServiceImpl.getInstance();
+	private UrlService urlService = UrlServiceImpl.getInstance();
 	
 	private ResourceBundle resources = ResourceBundle.getBundle(Config.MESSAGES_FILE);
 	
@@ -59,9 +65,12 @@ public class JanelaPrincipal extends JFrame {
 	public void gerarControle() {
 		if (componentesEstaoValidos()) {
 			String ctrl = geradorControle.gerarCodigoControle(txtCpfCnpj.getText());
+			persisteUrls();
 			try {
-				URL100Corretor url100Corretor = new URL100Corretor(txtUrl.getText(), txtCpfCnpj.getText(), txtId_Cia.getText(), txtNome.getText(), ctrl);
+				URL100Corretor url100Corretor = new URL100Corretor(txtUrl.getSelectedItem().toString(), txtCpfCnpj.getText(), txtId_Cia.getText(), txtNome.getText(), ctrl);
 				URLUtil.abrirUrl(url100Corretor.getUrlCompleta());
+				removerTodasUrls();
+				popularUrls();
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(null, "Erro ao abrir a URL");
 			}
@@ -71,6 +80,21 @@ public class JanelaPrincipal extends JFrame {
 			mensagens = new StringBuilder();
 			
 		}
+	}
+
+	
+
+	private void persisteUrls() {
+		List<String> urls = new ArrayList<String>();
+		int itens = txtUrl.getItemCount();
+		for (int i = 0; i < itens; i++) {
+			urls.add(txtUrl.getItemAt(i).toString());
+		}
+		if (txtUrl.getSelectedIndex() == -1) {
+			urls.add(txtUrl.getSelectedItem().toString());
+		}
+		
+		urlService.persistirUrls(urls);
 	}
 
 	private boolean componentesEstaoValidos() {
@@ -95,7 +119,7 @@ public class JanelaPrincipal extends JFrame {
 		this.setLayout(new GridLayout(5, 1));
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setSize(500, 150);
+		this.setSize(900, 150);
 		this.setLocationRelativeTo(null);
 		
 		JPanel primeiraLinha = new JPanel(new GridLayout(1,2));
@@ -155,7 +179,8 @@ public class JanelaPrincipal extends JFrame {
 
 		
 		lblUrl.setText(resources.getString(MessagesUtil.URL_LABEL_KEY));
-//		txtUrl.setEditable(false);
+		txtUrl.setEditable(true);
+		popularUrls();
 		
 		btnGerarUrl.setText(resources.getString(MessagesUtil.GERAR_CODIGO_LABEL_KEY));
 		btnBradescor.setText(resources.getString(MessagesUtil.BRADESCOR_LABEL_KEY));
@@ -163,6 +188,26 @@ public class JanelaPrincipal extends JFrame {
 		
 		
 
+	}
+
+	private void removerTodasUrls() {
+		int itemCount = txtUrl.getItemCount();
+
+	    for(int i=0;i<itemCount;i++){
+	    	txtUrl.removeItemAt(0);
+	     }
+		
+	}
+	
+	private void popularUrls() {
+		List<String> urls = urlService.obterUrls();
+		
+		if (urls != null && urls.size() > 0) {
+			for (String url : urls) {
+				txtUrl.addItem(url);
+			}
+		}
+		
 	}	
 	
 }
