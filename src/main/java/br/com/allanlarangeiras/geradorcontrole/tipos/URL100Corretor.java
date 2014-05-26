@@ -18,7 +18,7 @@ public class URL100Corretor {
 		parametros.put(ParametrosURL.CORRETOR.toString(), cpfCnpjCorretor);
 		parametros.put(ParametrosURL.ID_CIA.toString(), id_cia);
 		
-		urlCompleta = new URL(URLUtil.obterURL(urlBase, parametros));
+		urlCompleta =  new URL(URLUtil.obterURL(urlBase, parametros));
 		
 	}
 	
