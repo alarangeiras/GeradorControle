@@ -2,15 +2,20 @@ package br.com.allanlarangeiras.geradorcontrole.gui;
 
 import static br.com.allanlarangeiras.geradorcontrole.util.ValidadorUtil.isInteiroValido;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -18,36 +23,34 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import br.com.allanlarangeiras.geradorcontrole.service.GeradorControleService;
-import br.com.allanlarangeiras.geradorcontrole.service.UrlService;
 import br.com.allanlarangeiras.geradorcontrole.service.impl.GeradorControleServiceImpl;
-import br.com.allanlarangeiras.geradorcontrole.service.impl.UrlServiceImpl;
 import br.com.allanlarangeiras.geradorcontrole.tipos.URL100Corretor;
 import br.com.allanlarangeiras.geradorcontrole.util.Config;
 import br.com.allanlarangeiras.geradorcontrole.util.MessagesUtil;
-import br.com.allanlarangeiras.geradorcontrole.util.URLUtil;
 
-public class JanelaPrincipal extends JFrame {
+public class JanelaPrincipal extends JFrame implements ClipboardOwner {
 
 	private JLabel lblCpfCnpj = new JLabel();
-	private JTextField txtCpfCnpj = new JTextField();
+	private JTextField txtCpfCnpj = new JTextField(20);
 
 	private JLabel lblNome = new JLabel();
-	private JTextField txtNome = new JTextField();
+	private JTextField txtNome = new JTextField(20);
 
 	private JLabel lblId_Cia = new JLabel();
-	private JTextField txtId_Cia = new JTextField();
+	private JTextField txtId_Cia = new JTextField(20);
 	
-	private JLabel lblUrl = new JLabel();
-	private JComboBox<String> txtUrl = new JComboBox<String>();
+	private JLabel lblParametros = new JLabel();
+	private JTextField txtParametros = new JTextField(20);
 
-	private JButton btnGerarUrl = new JButton();
+	private JButton btnGerarControle = new JButton();
 	private JButton btnBradescor = new JButton();
+	
+	private JButton btnCopy = new JButton();
 
 	
 	private StringBuilder mensagens = new StringBuilder();
 	
 	private GeradorControleService geradorControle = GeradorControleServiceImpl.getInstance();
-	private UrlService urlService = UrlServiceImpl.getInstance();
 	
 	private ResourceBundle resources = ResourceBundle.getBundle(Config.MESSAGES_FILE);
 	
@@ -65,12 +68,12 @@ public class JanelaPrincipal extends JFrame {
 	public void gerarControle() {
 		if (componentesEstaoValidos()) {
 			String ctrl = geradorControle.gerarCodigoControle(txtCpfCnpj.getText());
-			persisteUrls();
 			try {
-				URL100Corretor url100Corretor = new URL100Corretor(txtUrl.getSelectedItem().toString(), txtCpfCnpj.getText(), txtId_Cia.getText(), txtNome.getText(), ctrl);
-				URLUtil.abrirUrl(url100Corretor.getUrlCompleta());
-				removerTodasUrls();
-				popularUrls();
+				URL100Corretor url100Corretor = new URL100Corretor(txtCpfCnpj.getText(), txtId_Cia.getText(), txtNome.getText(), ctrl);
+				String urlRelativa = url100Corretor.getUrlRelativa();
+				if (urlRelativa != null && !urlRelativa.isEmpty()) {
+					txtParametros.setText(urlRelativa);
+				}
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(null, "Erro ao abrir a URL");
 			}
@@ -80,33 +83,6 @@ public class JanelaPrincipal extends JFrame {
 			mensagens = new StringBuilder();
 			
 		}
-	}
-
-	
-
-	private void persisteUrls() {
-		List<String> urls = new ArrayList<String>();
-		int itens = txtUrl.getItemCount();
-		for (int i = 0; i < itens; i++) {
-			if (urls.size() < 10) {
-				urls.add(txtUrl.getItemAt(i).toString());
-				
-			} 
-		}
-		if (txtUrl.getSelectedIndex() == -1) {
-			boolean existe = false;
-			for (String url : urls) {
-				if (url.contains(txtUrl.getSelectedItem().toString()) || url.equalsIgnoreCase(txtUrl.getSelectedItem().toString())) { 
-					existe = true;
-				}
-			}
-			if (!existe) {
-				urls.add(txtUrl.getSelectedItem().toString());
-				
-			}
-		}
-		
-		urlService.persistirUrls(urls);
 	}
 
 	private boolean componentesEstaoValidos() {
@@ -131,27 +107,44 @@ public class JanelaPrincipal extends JFrame {
 		this.setLayout(new GridLayout(5, 1));
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setSize(900, 150);
+		this.setSize(700, 150);
 		this.setLocationRelativeTo(null);
 		
-		JPanel primeiraLinha = new JPanel(new GridLayout(1,2));
-		primeiraLinha.add(lblCpfCnpj);
-		primeiraLinha.add(txtCpfCnpj);
+		GridBagLayout layout = new GridBagLayout();
+		GridBagConstraints col1 = new GridBagConstraints();
+		col1.anchor = GridBagConstraints.LINE_START;
+		col1.gridx = 0;
+		col1.gridy = 0;
+		col1.weightx = 0;
+		col1.weighty = 0.5;
+		col1.insets = new Insets(5, 5, 5, 5);
 		
-		JPanel segundaLinha = new JPanel(new GridLayout(1,2));
-		segundaLinha.add(lblNome);
-		segundaLinha.add(txtNome);
+		GridBagConstraints col2 = new GridBagConstraints();
+		col2.fill = GridBagConstraints.HORIZONTAL;
+		col2.gridx = 1;
+		col1.gridy = 0;
+		col2.weightx = 0.5;
+		col2.weighty = 0.5;
+		col2.insets = new Insets(3, 10, 3, 10);
 
-		JPanel teceiraLinha = new JPanel(new GridLayout(1,2));
-		teceiraLinha.add(lblId_Cia);
-		teceiraLinha.add(txtId_Cia);
-
-		JPanel quartaLinha = new JPanel(new GridLayout(1,2));
-		quartaLinha.add(lblUrl);
-		quartaLinha.add(txtUrl);
+		JPanel primeiraLinha = new JPanel(layout);
+		primeiraLinha.add(lblCpfCnpj, col1);
+		primeiraLinha.add(txtCpfCnpj, col2);
 		
-		JPanel quintaLinha = new JPanel(new GridLayout(1,2));
-		quintaLinha.add(btnGerarUrl);
+		JPanel segundaLinha = new JPanel(layout);
+		segundaLinha.add(lblNome, col1);
+		segundaLinha.add(txtNome, col2);
+
+		JPanel teceiraLinha = new JPanel(layout);
+		teceiraLinha.add(lblId_Cia, col1);
+		teceiraLinha.add(txtId_Cia, col2);
+
+		JPanel quartaLinha = new JPanel(layout);
+		quartaLinha.add(lblParametros, col1);
+		quartaLinha.add(txtParametros, col2);
+		
+		JPanel quintaLinha = new JPanel(new GridLayout(1, 2));
+		quintaLinha.add(btnGerarControle);
 		quintaLinha.add(btnBradescor);
 		
 		this.add(primeiraLinha);
@@ -162,7 +155,7 @@ public class JanelaPrincipal extends JFrame {
 		
 		final JanelaPrincipal janelaPrincipal = this;
 
-		btnGerarUrl.addActionListener(new ActionListener() {
+		btnGerarControle.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
 				janelaPrincipal.gerarControle();
@@ -190,36 +183,20 @@ public class JanelaPrincipal extends JFrame {
 		txtId_Cia.setText(resources.getString(MessagesUtil.CIA_DEFAULT_VALUE_KEY));
 
 		
-		lblUrl.setText(resources.getString(MessagesUtil.URL_LABEL_KEY));
-		txtUrl.setEditable(true);
-		popularUrls();
+		lblParametros.setText(resources.getString(MessagesUtil.PARAMETROS_LABEL_KEY));
+		txtParametros.setEditable(false);
 		
-		btnGerarUrl.setText(resources.getString(MessagesUtil.GERAR_CODIGO_LABEL_KEY));
+		btnGerarControle.setText(resources.getString(MessagesUtil.GERAR_CODIGO_LABEL_KEY));
 		btnBradescor.setText(resources.getString(MessagesUtil.BRADESCOR_LABEL_KEY));
-
 		
 		
 
 	}
 
-	private void removerTodasUrls() {
-		int itemCount = txtUrl.getItemCount();
-
-	    for(int i=0;i<itemCount;i++){
-	    	txtUrl.removeItemAt(0);
-	     }
+	@Override
+	public void lostOwnership(Clipboard clipboard, Transferable contents) {
+		// TODO Auto-generated method stub
 		
 	}
-	
-	private void popularUrls() {
-		List<String> urls = urlService.obterUrls();
-		
-		if (urls != null && urls.size() > 0) {
-			for (String url : urls) {
-				txtUrl.addItem(url);
-			}
-		}
-		
-	}	
 	
 }

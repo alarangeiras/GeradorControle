@@ -9,20 +9,20 @@ import br.com.allanlarangeiras.geradorcontrole.util.URLUtil;
 
 public class URL100Corretor {
 
-	private URL urlCompleta;
+	private String urlRelativa;
 	
-	public URL100Corretor(String urlBase, String cpfCnpjCorretor, String id_cia, String nome, String ctrl) throws MalformedURLException {
+	public URL100Corretor(String cpfCnpjCorretor, String id_cia, String nome, String ctrl) throws MalformedURLException {
 		Map<String, String> parametros = new HashMap<String, String>();
 		parametros.put(ParametrosURL.CTRL.toString(), ctrl);
 		parametros.put(ParametrosURL.NOME.toString(), nome);
 		parametros.put(ParametrosURL.CORRETOR.toString(), cpfCnpjCorretor);
 		parametros.put(ParametrosURL.ID_CIA.toString(), id_cia);
 		
-		urlCompleta =  new URL(URLUtil.obterURL(urlBase, parametros));
+		this.urlRelativa =  URLUtil.obterURL(parametros);
 		
 	}
 	
-	public URL getUrlCompleta() {
-		return urlCompleta;
+	public String getUrlRelativa() {
+		return urlRelativa;
 	}
 }

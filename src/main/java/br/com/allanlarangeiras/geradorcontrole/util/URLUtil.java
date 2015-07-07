@@ -24,23 +24,19 @@ public class URLUtil {
 		}
 	}
 	
-	public static String obterURL(String urlBase, Map<String, String> parametros) {
-		StringBuilder urlCompleta = new StringBuilder();
-		if (urlBase.length() > 0 && !urlBase.startsWith(HTTP)) {
-			urlCompleta.append(HTTP + "://");
-		}
-		urlCompleta.append(urlBase);
-		urlCompleta.append(INTERROGACAO );
+	public static String obterURL(Map<String, String> parametros) {
+		StringBuilder urlRelativa = new StringBuilder();
+		urlRelativa.append(INTERROGACAO);
 		for (Map.Entry<String, String> parametro : parametros.entrySet()) {
-			if (urlCompleta.toString().charAt(urlCompleta.length()-1) != '?') {
-				urlCompleta.append(AND );
+			if (urlRelativa.toString().charAt(urlRelativa.length()-1) != '?') {
+				urlRelativa.append(AND );
 
 			}
-			urlCompleta.append(parametro.getKey());
-			urlCompleta.append(IGUAL);
-			urlCompleta.append(parametro.getValue());
+			urlRelativa.append(parametro.getKey());
+			urlRelativa.append(IGUAL);
+			urlRelativa.append(parametro.getValue());
 		}
-		return urlCompleta.toString();
+		return urlRelativa.toString();
 	}
 	
 }

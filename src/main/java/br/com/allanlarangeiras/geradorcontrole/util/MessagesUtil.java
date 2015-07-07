@@ -17,11 +17,9 @@ public final class MessagesUtil {
 	public static final String NOME_LABEL_KEY = "nome.label";
 	public static final String CIA_LABEL_KEY = "cia.label";
 	public static final String CTRL_LABEL_KEY = "ctrl.label";
-	public static final String URL_LABEL_KEY = "url.label";
+	public static final String PARAMETROS_LABEL_KEY = "parametros.label";
 	public static final String GERAR_CODIGO_LABEL_KEY = "gerar.codigo.label";
 	public static final String BRADESCOR_LABEL_KEY = "bradescor.label";
-
-	
 	
 	private MessagesUtil() { }
 	
