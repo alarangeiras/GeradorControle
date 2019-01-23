@@ -7,7 +7,7 @@ import br.com.allanlarangeiras.geradorcontrole.service.impl.GeradorControleServi
 
 public class Main {
 
-	public static void main(String[] args) {
+/*	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 		System.out.print("Entre com o CPF/CNPJ: ");
 		String cpfCnpj = scanner.nextLine();
@@ -22,5 +22,5 @@ public class Main {
 		System.out.println("\nPressione qualquer tecla para continuar\n");
 		scanner.nextLine();
 	}
-	
+*/	
 }

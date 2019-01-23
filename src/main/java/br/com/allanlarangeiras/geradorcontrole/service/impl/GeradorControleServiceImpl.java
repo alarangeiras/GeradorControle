@@ -2,9 +2,12 @@ package br.com.allanlarangeiras.geradorcontrole.service.impl;
 
 import java.util.Date;
 
+import org.springframework.stereotype.Service;
+
 import br.com.allanlarangeiras.geradorcontrole.service.GeradorControleService;
 import br.com.allanlarangeiras.geradorcontrole.util.Compact;
 
+@Service
 public class GeradorControleServiceImpl implements GeradorControleService {
 
 	private static final GeradorControleService INSTANCE = new GeradorControleServiceImpl();
