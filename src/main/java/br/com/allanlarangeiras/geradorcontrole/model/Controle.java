@@ -1,5 +1,7 @@
 package br.com.allanlarangeiras.geradorcontrole.model;
 
+import br.com.allanlarangeiras.geradorcontrole.util.StringUtil;
+
 public class Controle {
 
 	public String cpfCnpj;
@@ -10,7 +12,7 @@ public class Controle {
 			cpfCnpj = "43338235000109";
 		}
 		
-		this.cpfCnpj = cpfCnpj;
+		this.cpfCnpj = StringUtil.onlyNumbers(cpfCnpj);
 	}
 	public String getCpfCnpj() {
 		return cpfCnpj;
