@@ -9,20 +9,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import br.com.allanlarangeiras.geradorcontrole.model.Controle;
 import br.com.allanlarangeiras.geradorcontrole.service.GeradorControleService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 @Controller
+@Api(value="Gerador de Controle")
 public class GeradorController {
 	
-	
-	private GeradorControleService geradorControleService;
-
 	@Autowired
-	public GeradorController(GeradorControleService geradorControleService) {
-		this.geradorControleService = geradorControleService;
-	}
+	private GeradorControleService geradorControleService;
 	
 	@RequestMapping(value= {"/gerar/{cpfCnpj}", "/gerar"}, method=RequestMethod.GET)
 	@ResponseBody
+	@ApiOperation(value = "Gera o controle com base no CNPJ")
 	public Controle gerar(@PathVariable(value = "cpfCnpj", required=false) String cpfCnpj) {
 		Controle controle = new Controle(cpfCnpj);
 		controle.setControle(geradorControleService.gerarCodigoControle(controle.getCpfCnpj()));
